@@ -1,6 +1,6 @@
 namespace Calculator.Tests;
 
-public class E2ETest
+public class TestE2E
 {
 	[Theory]
 	[InlineData("1", "1")]
