@@ -4,8 +4,8 @@ public class TestTokenizer
 {
 
 	[Theory]
-	[InlineData("+-*/()", new TokenType[]{TokenType.Add, TokenType.Sub, TokenType.Mul, TokenType.Div, TokenType.Open, TokenType.Close})]
-	[InlineData("2 + 2 * (9 / -3)", new TokenType[]{TokenType.Number, TokenType.Add, TokenType.Number, TokenType.Mul, TokenType.Open, TokenType.Number, TokenType.Div, TokenType.Sub, TokenType.Number, TokenType.Close})]
+	[InlineData("+-*/()", new TokenType[]{TokenType.Add, TokenType.Sub, TokenType.Mul, TokenType.Div, TokenType.Open, TokenType.Close, TokenType.Eof})]
+	[InlineData("2 + 2 * (9 / -3)", new TokenType[]{TokenType.Number, TokenType.Add, TokenType.Number, TokenType.Mul, TokenType.Open, TokenType.Number, TokenType.Div, TokenType.Sub, TokenType.Number, TokenType.Close, TokenType.Eof})]
 	public void TokenKeys(string expr, TokenType[] want)
 	{
 		var res = Tokenizer.Do(expr);

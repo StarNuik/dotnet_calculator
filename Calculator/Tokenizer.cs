@@ -32,6 +32,7 @@ public static class Tokenizer
 			(var token, next) = NextToken(next);
 			tokens.Add(token);
 		}
+		tokens.Add(new Token{Key = TokenType.Eof});
 		return tokens.ToArray();
 	}
 

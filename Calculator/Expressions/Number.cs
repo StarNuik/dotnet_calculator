@@ -4,12 +4,12 @@ public class Number : IExpression
 {
 	float value;
 
-	public Number(float val)
-	{
-		this.value = val;
-	}
+    public Number(Token token)
+    {
+		value = float.Parse(token.Value);
+    }
 
-	public float Collect()
+    public float Collect()
 	{
 		return value;
 	}

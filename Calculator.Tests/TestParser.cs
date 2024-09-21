@@ -10,8 +10,43 @@ public class TestParser
 	{
 		var tokens = new Token[]{
 			new Token{Key = TokenType.Number, Value = tokenValue},
+			new Token{Key = TokenType.Eof},
 		};
-		var res = Parser.Do(tokens).Collect();
-		Assert.Equal(want, res);
+		var res = Parser.Do(tokens);
+		Assert.IsType<Expressions.Number>(res);
+		Assert.Equal(want, res.Collect());
+	}
+
+	[Theory]
+	[InlineData("2 + 2", 4f, typeof(Expressions.Add))]
+	[InlineData("8 / 2", 4f, typeof(Expressions.Divide))]
+	[InlineData("2 * 2", 4f, typeof(Expressions.Multiply))]
+	[InlineData("-4", -4f, typeof(Expressions.Negate))]
+	[InlineData("6 - 2", 4f, typeof(Expressions.Subtract))]
+	public void BasicExpressions(string expr, float want, Type wantT)
+	{
+		var tokens = Tokenizer.Do(expr);
+		var res = Parser.Do(tokens);
+		Assert.IsType(wantT, res);
+		Assert.Equal(want, res.Collect());
+	}
+
+	[Theory]
+	[InlineData("1 + 1 + -1 + -1", 0f)]
+	[InlineData("2 * 2 * 2 * 2 * 0", 0f)]
+	[InlineData("-1 + (5 + 4 + 3 + 2 + 1) / 15", 0f)]
+	[InlineData("2 + 3 * 4 + 5", 19f)]
+	[InlineData("(2 + 3) * 4 + 5", 25f)]
+	[InlineData("2 + 3 * (4 + 5)", 29f)]
+	[InlineData("(2 + 3) * (4 + 5)", 45f)]
+	[InlineData("2 * 3 + 4 * 5", 26f)]
+	[InlineData("(2 * 3 + 4) * 5", 50f)]
+	[InlineData("2 * (3 + 4 * 5)", 46f)]
+	[InlineData("2 * (3 + 4) * 5", 70f)]
+	public void ExpressionResults(string expr, float want)
+	{
+		var tokens = Tokenizer.Do(expr);
+		var res = Parser.Do(tokens);
+		Assert.Equal(want, res.Collect());
 	}
 }
