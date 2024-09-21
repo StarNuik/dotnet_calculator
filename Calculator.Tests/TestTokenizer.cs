@@ -19,4 +19,16 @@ public class TestTokenizer
 		var res = Tokenizer.Do(expr);
 		Assert.Equal(want, res);
 	}
+
+	[Fact]
+	public void Throws()
+	{
+		var chars = "!@#$%^&_=abcdefgwxyzABCXYZ[]{}";
+		foreach (var ch in chars)
+		{
+			var expr = "123 * " + ch;
+			var call = () => Tokenizer.Do(expr);
+			Assert.Throws<NotImplementedException>(call);
+		}
+	}
 }
