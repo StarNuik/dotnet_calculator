@@ -15,16 +15,17 @@ public enum TokenType
 	Eof,
 }
 
-// public struct Token
-// {
-
-// }
+public struct Token
+{
+	public TokenType Key;
+	public string Value;
+}
 
 public static class Tokenizer
 {
-	public static TokenType[] Do(string @in)
+	public static Token[] Do(string @in)
 	{
-		var tokens = new List<TokenType>();
+		var tokens = new List<Token>();
 		var next = @in.Replace(" ", "");
 		while (!string.IsNullOrEmpty(next))
 		{
@@ -34,16 +35,16 @@ public static class Tokenizer
 		return tokens.ToArray();
 	}
 
-	private static (TokenType token, string leftover) NextToken(string @in)
+	private static (Token token, string leftover) NextToken(string @in)
 	{
 		if (string.IsNullOrEmpty(@in)) {
-			return (TokenType.Eof, "");
+			return (new Token{Key = TokenType.Eof}, "");
 		}
 		if (char.IsNumber(@in[0])) {
 			return NextNumber(@in);
 		}
 
-		var token = @in[0] switch {
+		var tokenT = @in[0] switch {
 			'+' => TokenType.Add,
 			'-' => TokenType.Sub,
 			'*' => TokenType.Mul,
@@ -52,10 +53,11 @@ public static class Tokenizer
 			')' => TokenType.Close,
 			_ => throw new NotImplementedException(),
 		};
-		return (token, @in.Substring(1));
+		
+		return (new Token{Key = tokenT}, @in.Substring(1));
 	}
 
-	private static (TokenType token, string leftover) NextNumber(string @in)
+	private static (Token token, string leftover) NextNumber(string @in)
 	{
 		var len = 0;
 		while (len < @in.Length
@@ -63,6 +65,10 @@ public static class Tokenizer
 		{
 			len++;
 		}
-		return (TokenType.Number, @in.Remove(0, len));
+		var token = new Token{
+			Key = TokenType.Number,
+			Value = @in.Substring(0, len),
+		};
+		return (token, @in.Remove(0, len));
 	}
 }
