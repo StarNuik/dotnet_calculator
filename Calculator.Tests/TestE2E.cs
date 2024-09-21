@@ -56,6 +56,20 @@ public class TestE2E
 
 	private void Roundtrip(string expr, string want)
 	{
-		Assert.Equal(want, Program.Do(expr));
+		var res = Program.Do(expr);
+		Assert.Equal(want, res);
+	}
+
+	[Theory]
+	[InlineData("1 + 2 +")]
+	[InlineData("%&$()")]
+	[InlineData("1 - ")]
+	[InlineData("((((()))))")]
+	[InlineData("(1 + ())")]
+	[InlineData("Hello, world!")]
+	public void Errors(string expr)
+	{
+		var res = Program.Do(expr);
+		Assert.StartsWith("Error:", res);
 	}
 }

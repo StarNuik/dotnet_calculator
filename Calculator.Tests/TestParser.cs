@@ -92,6 +92,6 @@ public class TestParser
 	{
 		var tokens = Tokenizer.Do(expr);
 		var call = () => Parser.Do(tokens);
-		Assert.Throws<NotImplementedException>(call);
+		Assert.ThrowsAny<CantParseException>(call);
 	}
 }

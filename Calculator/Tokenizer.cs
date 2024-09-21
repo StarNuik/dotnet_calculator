@@ -1,26 +1,5 @@
 namespace Calculator;
 
-public enum TokenType
-{
-	Number,
-	
-	Add,
-	Sub,
-	Mul,
-	Div,
-
-	Open,
-	Close,
-
-	Eof,
-}
-
-public struct Token
-{
-	public TokenType Key;
-	public string Value;
-}
-
 public static class Tokenizer
 {
 	public static Token[] Do(string @in)
@@ -53,7 +32,7 @@ public static class Tokenizer
 			'/' => TokenType.Div,
 			'(' => TokenType.Open,
 			')' => TokenType.Close,
-			_ => throw new NotImplementedException(),
+			_ => throw new CantTokenizeException(@in[0].ToString()),
 		};
 		
 		return (new Token{Key = tokenT}, @in.Substring(1));

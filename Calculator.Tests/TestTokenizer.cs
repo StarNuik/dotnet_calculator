@@ -34,7 +34,7 @@ public class TestTokenizer
 		{
 			var expr = "123 * " + ch;
 			var call = () => Tokenizer.Do(expr);
-			Assert.Throws<NotImplementedException>(call);
+			Assert.Throws<CantTokenizeException>(call);
 		}
 	}
 }

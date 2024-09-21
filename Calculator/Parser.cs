@@ -11,7 +11,6 @@ primary ::= (number | "(" expression ")" )
 
 public interface IExpression
 {
-	// public IExpression[] Children();
 	public float Collect();
 }
 
@@ -21,7 +20,7 @@ public static class Parser
 	{
 		(var expr, tokens) = Expression(tokens);
 		if (tokens[0].Key != TokenType.Eof) {
-			throw new NotImplementedException();
+			throw new CantParseException("generic parsing error");
 		}
 		return expr;
 	}
@@ -36,7 +35,7 @@ public static class Parser
 			expr = op switch {
 				TokenType.Add => new Expressions.Add(expr, other),
 				TokenType.Sub => new Expressions.Subtract(expr, other),
-				_ => throw new NotImplementedException(),
+				_ => throw new CantParseException("impossible error"),
 			};
 			op = tokens[0].Key;
 		}
@@ -53,7 +52,7 @@ public static class Parser
 			expr = op switch {
 				TokenType.Mul => new Expressions.Multiply(expr, other),
 				TokenType.Div => new Expressions.Divide(expr, other),
-				_ => throw new NotImplementedException(),
+				_ => throw new CantParseException("impossible error"),
 			};
 			op = tokens[0].Key;
 		}
@@ -83,10 +82,10 @@ public static class Parser
 			(var expr, tokens) = Expression(tokens[1..]);
 			if (tokens[0].Key != TokenType.Close)
 			{
-				throw new NotImplementedException();
+				throw new CantParseException("no closing bracket");
 			}
 			return (expr, tokens[1..]);
 		}
-		throw new NotImplementedException();
+		throw new CantParseException("trailing operator (probably)");
 	}
 }
