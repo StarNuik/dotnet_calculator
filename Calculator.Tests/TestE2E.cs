@@ -35,11 +35,11 @@ public class TestE2E
 
 	[Theory]
 	[InlineData("1 / 1", "1")]
-	[InlineData("1 / 2", "0")]
+	[InlineData("1 / 2", "0.5")]
 	[InlineData("2 / 1", "2")]
 	[InlineData("2 / 2", "1")]
 	[InlineData("4 / 2", "2")]
-	[InlineData("5 / 2", "2")]
+	[InlineData("5 / 2", "2.5")]
 	[InlineData("6 / 2", "3")]
 	public void Division(string expr, string want) => Roundtrip(expr, want);
 
@@ -51,7 +51,7 @@ public class TestE2E
 
 	[Theory]
 	[InlineData("(3 + 3) * 3", "18")]
-	[InlineData("3 * (3 + 3)", "12")]
+	[InlineData("3 * (3 + 3)", "18")]
 	public void Brackets(string expr, string want) => Roundtrip(expr, want);
 
 	private void Roundtrip(string expr, string want)

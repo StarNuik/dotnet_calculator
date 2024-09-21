@@ -49,4 +49,49 @@ public class TestParser
 		var res = Parser.Do(tokens);
 		Assert.Equal(want, res.Collect());
 	}
+
+	[Theory]
+	[InlineData("+")]
+	[InlineData("-")]
+	[InlineData("*")]
+	[InlineData("/")]
+	[InlineData("(")]
+	[InlineData(")")]
+	[InlineData("1 +")]
+	[InlineData("1 -")]
+	[InlineData("1 *")]
+	[InlineData("1 /")]
+	[InlineData("1 (")]
+	[InlineData("1 )")]
+	[InlineData("+ 1")]
+	[InlineData("* 1")]
+	[InlineData("/ 1")]
+	[InlineData("( 1")]
+	[InlineData(") 1")]
+	[InlineData("1 ( 1")]
+	[InlineData("1 ) 1")]
+	[InlineData("1 1 +")]
+	[InlineData("1 1 -")]
+	[InlineData("1 1 *")]
+	[InlineData("1 1 /")]
+	[InlineData("1 1 (")]
+	[InlineData("1 1 )")]
+	[InlineData("+ 1 1")]
+	[InlineData("- 1 1")]
+	[InlineData("* 1 1")]
+	[InlineData("/ 1 1")]
+	[InlineData("( 1 1")]
+	[InlineData(") 1 1")]
+	[InlineData("1 + 1 +")]
+	[InlineData("1 - 1 -")]
+	[InlineData("1 * 1 *")]
+	[InlineData("1 / 1 /")]
+	[InlineData("1 ( 1 (")]
+	[InlineData("1 ) 1 )")]
+	public void Throws(string expr)
+	{
+		var tokens = Tokenizer.Do(expr);
+		var call = () => Parser.Do(tokens);
+		Assert.Throws<NotImplementedException>(call);
+	}
 }

@@ -21,7 +21,7 @@ public class TestTokenizer
 	public void NumberValues(string want)
 	{
 		var res = Tokenizer.Do(want);
-		Assert.Single(res);
+		Assert.Equal(2, res.Length);
 		Assert.Equal(TokenType.Number, res[0].Key);
 		Assert.Equal(want, res[0].Value);
 	}

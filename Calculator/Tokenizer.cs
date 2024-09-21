@@ -26,9 +26,10 @@ public static class Tokenizer
 	public static Token[] Do(string @in)
 	{
 		var tokens = new List<Token>();
-		var next = @in.Replace(" ", "");
-		while (!string.IsNullOrEmpty(next))
+		var next = @in;
+		while (!string.IsNullOrWhiteSpace(next))
 		{
+			next = next.TrimStart();
 			(var token, next) = NextToken(next);
 			tokens.Add(token);
 		}

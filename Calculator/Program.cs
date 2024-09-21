@@ -11,6 +11,9 @@ public class Program
 
     public static string Do(string @in)
     {
-        return "1";
+        var tokens = Tokenizer.Do(@in);
+        var expr = Parser.Do(tokens);
+        var res = expr.Collect();
+        return res.ToString();
     }
 }
