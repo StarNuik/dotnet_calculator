@@ -23,6 +23,8 @@ public class TestParser
 	[InlineData("2 * 2", 4f, typeof(Expressions.Multiply))]
 	[InlineData("-4", -4f, typeof(Expressions.Negate))]
 	[InlineData("6 - 2", 4f, typeof(Expressions.Subtract))]
+	[InlineData("sqrt(16)", 4f, typeof(Expressions.Sqrt))]
+	[InlineData("pow(2, 2)", 4f, typeof(Expressions.Pow))]
 	public void BasicExpressions(string expr, float want, Type wantT)
 	{
 		var tokens = Tokenizer.Do(expr);
@@ -43,6 +45,11 @@ public class TestParser
 	[InlineData("(2 * 3 + 4) * 5", 50f)]
 	[InlineData("2 * (3 + 4 * 5)", 46f)]
 	[InlineData("2 * (3 + 4) * 5", 70f)]
+	[InlineData("2 * (2 + 2) * 2", 16)]
+	[InlineData("2 * sqrt(2 + 2) * 2", 8)]
+	[InlineData("2 + sqrt(2 * 2) + 2", 6)]
+	[InlineData("2 + sqrt((7 + 3) * 5 / 2)", 7)]
+	[InlineData("2 * pow((7 + 3) * 5 / (1 + 1), pow(5, 2) * 2 / 100)", 10)]
 	public void ExpressionResults(string expr, float want)
 	{
 		var tokens = Tokenizer.Do(expr);
@@ -88,6 +95,24 @@ public class TestParser
 	[InlineData("1 / 1 /")]
 	[InlineData("1 ( 1 (")]
 	[InlineData("1 ) 1 )")]
+	[InlineData("sqrt")]
+	[InlineData("sqrt (")]
+	[InlineData("sqrt )")]
+	[InlineData("sqrt ( )")]
+	[InlineData("sqrt ( + )")]
+	[InlineData("sqrt ( - )")]
+	[InlineData("sqrt ( * )")]
+	[InlineData("sqrt ( / )")]
+	[InlineData("sqrt ( , )")]
+	[InlineData("pow")]
+	[InlineData("pow (")]
+	[InlineData("pow )")]
+	[InlineData("pow ( )")]
+	[InlineData("pow ( + )")]
+	[InlineData("pow ( - )")]
+	[InlineData("pow ( * )")]
+	[InlineData("pow ( / )")]
+	[InlineData("pow ( , )")]
 	public void Throws(string expr)
 	{
 		var tokens = Tokenizer.Do(expr);
