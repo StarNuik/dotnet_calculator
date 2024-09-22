@@ -20,11 +20,11 @@ public class Program
 		}
 		catch (CantTokenizeException e)
 		{
-			return $"Error: symbol not supported: '{e.Message}'";
+			return $"Error: {e.Message}";
 		}
 		catch (CantParseException e)
 		{
-			return $"Error: incorrect input: {e.Message}";
+			return $"Error: {e.Message}";
 		}
 		catch
 		{
