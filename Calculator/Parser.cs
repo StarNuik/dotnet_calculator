@@ -10,14 +10,7 @@ function ::= "sqrt" "(" expression ")"
 */
 
 /*
-expression ::= multiply {( "+" | "-") multiply}
-multiply ::= unary {( "*" | "/") unary}
-unary ::= ["-"] primary
-primary ::= (number | block | function )
-function ::= "sqrt" block
-	| "pow" commablock
-block ::= "(" expression ")"
-commablock ::= "(" expression "," expression ")"
+
 */
 
 public interface IExpression
@@ -134,7 +127,7 @@ public static class Parser
 		{
 			throw new CantParseException("no open bracket");
 		}
-		
+
 		(var lhs, tokens) = Expression(tokens[1..]);
 		if (tokens[0].Key != TokenType.Comma)
 		{
