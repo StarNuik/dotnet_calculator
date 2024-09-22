@@ -4,14 +4,10 @@ public class TestTokenizer
 {
 
 	[Theory]
-	[InlineData("+-*/()", new TokenType[]{TokenType.Add, TokenType.Sub, TokenType.Mul, TokenType.Div, TokenType.Open, TokenType.Close, TokenType.Eof})]
-	[InlineData("2 + 2 * (9 / -3)", new TokenType[]{TokenType.Number, TokenType.Add, TokenType.Number, TokenType.Mul, TokenType.Open, TokenType.Number, TokenType.Div, TokenType.Sub, TokenType.Number, TokenType.Close, TokenType.Eof})]
+	[InlineData("+-*/(),", new TokenType[]{TokenType.Add, TokenType.Sub, TokenType.Mul, TokenType.Div, TokenType.Open, TokenType.Close, TokenType.Comma})]
+	[InlineData("2 + 2 * (9 / -3)", new TokenType[]{TokenType.Number, TokenType.Add, TokenType.Number, TokenType.Mul, TokenType.Open, TokenType.Number, TokenType.Div, TokenType.Sub, TokenType.Number, TokenType.Close})]
 	public void TokenKeys(string expr, TokenType[] want)
-	{
-		var res = Tokenizer.Do(expr);
-		var mapped = res.Select(tok => tok.Key);
-		Assert.Equal(want, mapped);
-	}
+		=> AssertAllKeys(expr, want);
 	
 	[Theory]
 	[InlineData("1")]
@@ -26,6 +22,12 @@ public class TestTokenizer
 		Assert.Equal(want, res[0].Value);
 	}
 
+	[Theory]
+	[InlineData("sqrt()", new TokenType[]{TokenType.Func, TokenType.Open, TokenType.Close})]
+	[InlineData("pow(,)", new TokenType[]{TokenType.Func, TokenType.Open, TokenType.Comma, TokenType.Close})]
+	public void FuncKeys(string expr, TokenType[] want)
+		=> AssertAllKeys(expr, want);
+
 	[Fact]
 	public void Throws()
 	{
@@ -36,5 +38,13 @@ public class TestTokenizer
 			var call = () => Tokenizer.Do(expr);
 			Assert.Throws<CantTokenizeException>(call);
 		}
+	}
+
+	private void AssertAllKeys(string expr, TokenType[] want)
+	{
+		want = want.Append(TokenType.Eof).ToArray();
+		var res = Tokenizer.Do(expr);
+		var mapped = res.Select(tok => tok.Key);
+		Assert.Equal(want, mapped);
 	}
 }

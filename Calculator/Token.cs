@@ -11,6 +11,9 @@ public enum TokenType
 
 	Open,
 	Close,
+	Comma,
+
+	Func,
 
 	Eof,
 }
