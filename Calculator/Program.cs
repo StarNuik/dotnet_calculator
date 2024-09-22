@@ -11,6 +11,11 @@ public class Program
 
 	public static string Do(string @in)
 	{
+		if (string.IsNullOrWhiteSpace(@in))
+		{
+			return "Error: empty input";
+		}
+		
 		try
 		{
 			var tokens = Tokenizer.Do(@in);
