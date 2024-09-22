@@ -9,6 +9,17 @@ function ::= "sqrt" "(" expression ")"
 	| "pow" "(" expression "," expression ")"
 */
 
+/*
+expression ::= multiply {( "+" | "-") multiply}
+multiply ::= unary {( "*" | "/") unary}
+unary ::= ["-"] primary
+primary ::= (number | block | function )
+function ::= "sqrt" block
+	| "pow" commablock
+block ::= "(" expression ")"
+commablock ::= "(" expression "," expression ")"
+*/
+
 public interface IExpression
 {
 	public float Collect();
@@ -76,19 +87,65 @@ public static class Parser
 
 	static (IExpression, Token[]) Primary(Token[] tokens)
 	{
-		if (tokens[0].Key == TokenType.Number)
+		return tokens[0].Key switch
 		{
-			return (new Expressions.Number(tokens[0]), tokens[1..]);
-		}
-		else if (tokens[0].Key == TokenType.Open)
+			TokenType.Func => Function(tokens),
+			TokenType.Open => Block(tokens),
+			TokenType.Number => (new Expressions.Number(tokens[0]), tokens[1..]),
+			_ => throw new CantParseException("trailing operator (probably)"),
+		};
+	}
+
+
+	static (IExpression, Token[]) Function(Token[] tokens)
+	{
+		if (tokens[0].Value == "sqrt")
 		{
-			(var expr, tokens) = Expression(tokens[1..]);
-			if (tokens[0].Key != TokenType.Close)
-			{
-				throw new CantParseException("no closing bracket");
-			}
-			return (expr, tokens[1..]);
+			(var expr, tokens) = Block(tokens[1..]);
+			return (new Expressions.Sqrt(expr), tokens);
 		}
-		throw new CantParseException("trailing operator (probably)");
+		if (tokens[0].Value == "pow")
+		{
+			(var lhs, var rhs, tokens) = CommaBlock(tokens[1..]);
+			return (new Expressions.Pow(lhs, rhs), tokens);
+		}
+		throw new CantParseException("impossible error");
+	}
+
+	static (IExpression, Token[]) Block(Token[] tokens)
+	{
+		if (tokens[0].Key != TokenType.Open)
+		{
+			throw new CantParseException("no open bracket");
+		}
+
+		(var expr, tokens) = Expression(tokens[1..]);
+		
+		if (tokens[0].Key != TokenType.Close)
+		{
+			throw new CantParseException("no closed bracket");
+		}
+		return (expr, tokens[1..]);
+	}
+
+	static (IExpression, IExpression, Token[]) CommaBlock(Token[] tokens)
+	{
+		if (tokens[0].Key != TokenType.Open)
+		{
+			throw new CantParseException("no open bracket");
+		}
+		
+		(var lhs, tokens) = Expression(tokens[1..]);
+		if (tokens[0].Key != TokenType.Comma)
+		{
+			throw new CantParseException("no comma");
+		}
+
+		(var rhs, tokens) = Expression(tokens[1..]);
+		if (tokens[0].Key != TokenType.Close)
+		{
+			throw new CantParseException("no closing bracket");
+		}
+		return (lhs, rhs, tokens[1..]);
 	}
 }
