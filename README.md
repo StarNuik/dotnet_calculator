@@ -1,17 +1,5 @@
 # dotnet_calculator
-Basic CLI calculator
-
-## Spec
-```ebnf
-expression = multiply {( "+" | "-") multiply};
-multiply = unary {( "*" | "/") unary};
-unary = ["-"] primary;
-primary = ( number | block | function );
-function = "sqrt" block
-	| "pow" commablock;
-block = "(" expression ")";
-commablock = "(" expression "," expression ")";
-```
+Basic Cli calculator
 
 ## Installation
 ```bash
@@ -41,4 +29,16 @@ calc "2 * pow((7 + 3) * 5 / (1 + 1), pow(5, 2) * 2 / 100)"
 ## Testing
 ```bash
 dotnet test
+```
+
+## Spec
+```ebnf
+expression = multiply {( "+" | "-") multiply};
+multiply = unary {( "*" | "/") unary};
+unary = ["-"] primary;
+primary = ( number | block | function );
+function = "sqrt" block
+	| "pow" commablock;
+block = "(" expression ")";
+commablock = "(" expression "," expression ")";
 ```
