@@ -1,12 +1,12 @@
-using System.Security.Cryptography;
-
 namespace Calculator;
 
 /*
 expression ::= multiply {( "+" | "-") multiply}
 multiply ::= unary {( "*" | "/") unary}
 unary ::= ["-"] primary
-primary ::= (number | "(" expression ")" )
+primary ::= (number | "(" expression ")" | function )
+function ::= "sqrt" "(" expression ")"
+	| "pow" "(" expression "," expression ")"
 */
 
 public interface IExpression
@@ -19,7 +19,8 @@ public static class Parser
 	public static IExpression Do(Token[] tokens)
 	{
 		(var expr, tokens) = Expression(tokens);
-		if (tokens[0].Key != TokenType.Eof) {
+		if (tokens[0].Key != TokenType.Eof)
+		{
 			throw new CantParseException("generic parsing error");
 		}
 		return expr;
@@ -32,7 +33,8 @@ public static class Parser
 		while (op == TokenType.Add || op == TokenType.Sub)
 		{
 			(var other, tokens) = Multiply(tokens[1..]);
-			expr = op switch {
+			expr = op switch
+			{
 				TokenType.Add => new Expressions.Add(expr, other),
 				TokenType.Sub => new Expressions.Subtract(expr, other),
 				_ => throw new CantParseException("impossible error"),
@@ -49,7 +51,8 @@ public static class Parser
 		while (op == TokenType.Mul || op == TokenType.Div)
 		{
 			(var other, tokens) = Unary(tokens[1..]);
-			expr = op switch {
+			expr = op switch
+			{
 				TokenType.Mul => new Expressions.Multiply(expr, other),
 				TokenType.Div => new Expressions.Divide(expr, other),
 				_ => throw new CantParseException("impossible error"),
