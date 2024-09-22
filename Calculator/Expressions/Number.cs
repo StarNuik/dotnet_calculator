@@ -10,7 +10,7 @@ public class Number : IExpression
 		{
 			value = float.Parse(token.Value);
 		}
-		catch (FormatException e)
+		catch
 		{
 			throw new CantParseException(
 				$"number is incorrect: '{token.Value}'"
