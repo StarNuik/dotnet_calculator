@@ -6,7 +6,16 @@ public class Number : IExpression
 
     public Number(Token token)
     {
-		value = float.Parse(token.Value);
+		try
+		{
+			value = float.Parse(token.Value);
+		}
+		catch (FormatException e)
+		{
+			throw new CantParseException(
+				$"number is incorrect: '{token.Value}'"
+			);
+		}
     }
 
     public float Collect()

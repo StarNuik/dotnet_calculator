@@ -27,7 +27,7 @@ public static class Tokenizer
 		{
 			return (new Token{Key = TokenType.Eof}, "");
 		}
-		if (char.IsAsciiDigit(@in[0]))
+		if (char.IsAsciiDigit(@in[0]) || @in[0] == '.')
 		{
 			return NextNumber(@in);
 		}

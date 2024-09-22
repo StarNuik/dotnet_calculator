@@ -6,6 +6,8 @@ public class TestParser
 	[InlineData(1f, "1")]
 	[InlineData(1f, "1.0")]
 	[InlineData(3.141592f, "3.141592")]
+	[InlineData(1f, "1.")]
+	[InlineData(0.1f, ".1")]
 	public void Numbers(float want, string tokenValue)
 	{
 		var tokens = new Token[]{
@@ -58,6 +60,9 @@ public class TestParser
 	}
 
 	[Theory]
+	[InlineData("1.2.3")]
+	[InlineData("1..")]
+	[InlineData(".2.")]
 	[InlineData("+")]
 	[InlineData("-")]
 	[InlineData("*")]
