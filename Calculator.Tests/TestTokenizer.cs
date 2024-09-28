@@ -41,6 +41,12 @@ public class TestTokenizer
 		=> AssertRpn(expr, want);
 
 	[Theory]
+	[InlineData("(1 + 2) * 3", "1 2 + 3 *")]
+	[InlineData("1 * (2 + 3)", "1 2 3 + *")]
+	public void Parentheses(string expr, string want)
+		=> AssertRpn(expr, want);
+
+	[Theory]
 	// [InlineData("1 ** 1")]
 	[InlineData(".")]
 	[InlineData("..")]
@@ -51,6 +57,12 @@ public class TestTokenizer
 	[InlineData("pow(1, 1)")]
 	[InlineData("tan(1)")]
 	[InlineData("abc")]
+	[InlineData("[1]")]
+	[InlineData("1 * (")]
+	[InlineData("1 * )")]
+	[InlineData("1 * (2 + 3))")]
+	[InlineData("1 * ((2 + 3)")]
+	// [InlineData("1 * (2 (+ 3))")]
 	public void Exceptions(string expr)
 	{
 		Assert.Throws<TokenizerException>(

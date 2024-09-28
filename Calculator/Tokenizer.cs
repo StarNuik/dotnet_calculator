@@ -8,14 +8,14 @@ public class TokenizerException : Exception
 
 public static class Tokenizer
 {
-	private class OpenBracket : IOperator
+	private class Open : IOperator
 	{
 		public string RepresentedBy => "(";
 		public int Precedence => throw new NotImplementedException();
 		public Associativity Associativity => throw new NotImplementedException();
 	}
 
-	private class ClosedBracket : IOperator
+	private class Close : IOperator
 	{
 		public string RepresentedBy => ")";
 		public int Precedence => throw new NotImplementedException();
@@ -29,7 +29,7 @@ public static class Tokenizer
 			op => op.RepresentedBy,
 			op => op
 		);
-		// AddBrackets(ops);
+		AddParentheses(ops);
 
 		var @out = new List<Token>();
 		var opStack = new Stack<Token>();
@@ -49,52 +49,67 @@ public static class Tokenizer
 
 			// else
 			(@in, token, var op) = SplitOperator(ops, @in);
-			PopLowerPrecedence(opStack, @out, op);
+			if (op is Open)
+			{
+				opStack.Push(token);
+				continue;
+			}
+			if (op is Close)
+			{
+				MoveUntilOpen(opStack, @out);
+				opStack.Pop();
+				continue;
+			}
+
+			// else
+			MoveLowerPrecedence(opStack, @out, op);
 			opStack.Push(token);
-
-			// if (op is OpenBracket)
-			// {
-			// 	opStack.Push(token);
-			// 	continue;
-			// }
-			// if (op is ClosedBracket)
-			// {
-			// 	while (opStack.Peek().Operator is not OpenBracket)
-			// 	{
-			// 		@out.Add(opStack.Pop());
-			// 	}
-			// 	opStack.Pop();
-			// 	continue;
-			// }
-
-			// while (opStack.Peek().Operator.Precedence >= op.Precedence)
-			// {
-			// 	@out.Add(opStack.Pop());
-			// }
-			// opStack.Push(token);
 		}
 
-		@out.AddRange(opStack);
-		opStack.Clear();
+		MoveFinal(opStack, @out);
 
 		return @out.ToArray();
 	}
 
-	private static void PopLowerPrecedence(Stack<Token> from, List<Token> to, IOperator op)
+	private static void MoveLowerPrecedence(Stack<Token> from, List<Token> to, IOperator op)
 	{
 		var @out = new List<Token>();
 		while (from.Count > 0
+			&& from.Peek().Operator is not Open
 			&& from.Peek().Operator.GreaterThan(op))
 		{
 			to.Add(from.Pop());
 		}
 	}
 
-	private static void AddBrackets(Dictionary<string, IOperator> ops)
+	private static void MoveUntilOpen(Stack<Token> from, List<Token> to)
+	{
+		while (from.Count > 0
+			&& from.Peek().Operator is not Open)
+		{
+			to.Add(from.Pop());
+		}
+		if (from.Count == 0)
+		{
+			throw new TokenizerException("invalid parentheses");
+		}
+	}
+
+	private static void MoveFinal(Stack<Token> opStack, List<Token> @out)
+	{
+		if (opStack.Any(tok => tok.Operator is Open))
+		{
+			throw new TokenizerException("invalid parentheses");
+		}
+		@out.AddRange(opStack);
+		opStack.Clear();
+	}
+
+	private static void AddParentheses(Dictionary<string, IOperator> ops)
 	{
 		var add = (IOperator op) => ops[op.RepresentedBy] = op;
-		add(new OpenBracket());
-		add(new ClosedBracket());
+		add(new Open());
+		add(new Close());
 	}
 
 	private static (string, Token) SplitNumber(string @in)
