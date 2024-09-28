@@ -8,6 +8,14 @@ public enum Associativity
 
 public interface IOperator
 {
-	public int Precedence { get; }
 	public string RepresentedBy { get; }
+	public int Precedence { get; }
+	public Associativity Associativity { get; }
+
+	public bool GreaterThan(IOperator other)
+	{
+		return this.Precedence > other.Precedence
+			|| (this.Precedence == other.Precedence
+				&& other.Associativity == Associativity.Left);
+	}
 }

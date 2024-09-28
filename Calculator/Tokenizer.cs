@@ -1,26 +1,34 @@
 namespace Calculator;
 
+public class TokenizerException : Exception
+{
+	public TokenizerException(string message) : base(message)
+	{}
+}
+
 public static class Tokenizer
 {
-    private class OpenBracket : IOperator
-    {
-        public string RepresentedBy => "(";
-        public int Precedence => throw new NotImplementedException();
-    }
+	private class OpenBracket : IOperator
+	{
+		public string RepresentedBy => "(";
+		public int Precedence => throw new NotImplementedException();
+		public Associativity Associativity => throw new NotImplementedException();
+	}
 
-    private class ClosedBracket : IOperator
-    {
-        public string RepresentedBy => ")";
-        public int Precedence => throw new NotImplementedException();
-    }
+	private class ClosedBracket : IOperator
+	{
+		public string RepresentedBy => ")";
+		public int Precedence => throw new NotImplementedException();
+		public Associativity Associativity => throw new NotImplementedException();
+	}
 
 	// TODO: clean up this majestic blanket of code
-    public static Token[] ToRpn(IOperator[] operators, string @in)
+	public static Token[] ToRpn(IOperator[] operators, string @in)
 	{
-		// var ops = operators.ToDictionary(
-		// 	op => op.RepresentedBy,
-		// 	op => op
-		// );
+		var ops = operators.ToDictionary(
+			op => op.RepresentedBy,
+			op => op
+		);
 		// AddBrackets(ops);
 
 		var @out = new List<Token>();
@@ -40,8 +48,10 @@ public static class Tokenizer
 			}
 
 			// else
-			// (@in, token) = SplitOperator(ops, @in);
-			// var op = token.Operator;
+			(@in, token, var op) = SplitOperator(ops, @in);
+			PopLowerPrecedence(opStack, @out, op);
+			opStack.Push(token);
+
 			// if (op is OpenBracket)
 			// {
 			// 	opStack.Push(token);
@@ -64,11 +74,20 @@ public static class Tokenizer
 			// opStack.Push(token);
 		}
 
-		// while (opStack.Count > 0)
-		// {
-		// 	@out.Add(opStack.Pop());
-		// }
+		@out.AddRange(opStack);
+		opStack.Clear();
+
 		return @out.ToArray();
+	}
+
+	private static void PopLowerPrecedence(Stack<Token> from, List<Token> to, IOperator op)
+	{
+		var @out = new List<Token>();
+		while (from.Count > 0
+			&& from.Peek().Operator.GreaterThan(op))
+		{
+			to.Add(from.Pop());
+		}
 	}
 
 	private static void AddBrackets(Dictionary<string, IOperator> ops)
@@ -82,24 +101,35 @@ public static class Tokenizer
 	{
 		var len = CountFirst(@in, IsNumberChar);
 
-		var token = new Token(float.Parse(@in[..len]));
+		float val;
+		try
+		{
+			val = float.Parse(@in[..len]);
+		}
+		catch (Exception e)
+		{
+			throw new TokenizerException($"couldn't parse number: {e.Message}");
+		}
+
+		var token = new Token(val);
 		return (@in[len..], token);
 	}
 
-	// private static (string, Token) SplitOperator(Dictionary<string, IOperator> ops, string @in)
-	// {
-	// 	// Did not use `.Single(predicate)`
-	// 	// so that I can throw a custom exception 
-	// 	var keys = ops.Keys.Where(@in.StartsWith);
-	// 	if (keys.Count() != 1)
-	// 	{
-	// 		throw new NotImplementedException();
-	// 	}
-	// 	var key = keys.Single();
+	private static (string, Token, IOperator) SplitOperator(Dictionary<string, IOperator> ops, string @in)
+	{
+		// Did not use `.Single(predicate)`
+		// so that I can throw a custom exception 
+		var keys = ops.Keys.Where(@in.StartsWith);
+		if (keys.Count() != 1)
+		{
+			throw new TokenizerException("unknown operator");
+		}
+		var key = keys.Single();
 
-	// 	var token = new Token(ops[key]);
-	// 	return (@in[key.Length..], token);
-	// }
+		var op = ops[key];
+		var token = new Token(op);
+		return (@in[key.Length..], token, op);
+	}
 
 	private static bool IsNumberChar(char ch)
 	{
