@@ -6,34 +6,13 @@ public class Program
 	{
 		var together = string.Join(" ", args);
 		var res = Do(together);
-		Console.WriteLine(res);
+		Console.WriteLine(res.ToString());
 	}
 
-	public static string Do(string @in)
+	public static float Do(string @in)
 	{
-		if (string.IsNullOrWhiteSpace(@in))
-		{
-			return "Error: empty input";
-		}
-		
-		try
-		{
-			var tokens = Tokenizer.Do(@in);
-			var expr = Parser.Do(tokens);
-			var res = expr.Collect();
-			return res.ToString();
-		}
-		catch (CantTokenizeException e)
-		{
-			return $"Error: {e.Message}";
-		}
-		catch (CantParseException e)
-		{
-			return $"Error: {e.Message}";
-		}
-		catch
-		{
-			return "Error: unknown error";
-		}
+		// var kernel = new Kernel();
+		//
+		throw new NotImplementedException();
 	}
 }

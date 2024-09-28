@@ -2,87 +2,108 @@ namespace Calculator;
 
 public static class Tokenizer
 {
-	private static HashSet<string> SupportedFunc = new()
-	{
-		"pow", "sqrt",
-	};
+    private class OpenBracket : IOperator
+    {
+        public string RepresentedBy => "(";
+        public int Precedence => throw new NotImplementedException();
+    }
 
-	public static Token[] Do(string @in)
+    private class ClosedBracket : IOperator
+    {
+        public string RepresentedBy => ")";
+        public int Precedence => throw new NotImplementedException();
+    }
+
+	// TODO: clean up this majestic blanket of code
+    public static List<Token> ToRpn(IOperator[] operators, string @in)
 	{
-		var tokens = new List<Token>();
-		var next = @in;
-		while (!string.IsNullOrWhiteSpace(next))
+		// var ops = operators.ToDictionary(
+		// 	op => op.RepresentedBy,
+		// 	op => op
+		// );
+		// AddBrackets(ops);
+
+		var @out = new List<Token>();
+		var opStack = new Stack<Token>();
+
+		while (!string.IsNullOrWhiteSpace(@in))
 		{
-			next = next.TrimStart();
-			(var token, next) = NextToken(next);
-			tokens.Add(token);
+			@in = @in.TrimStart();
+			Token token;
+			var next = @in[0];
+
+			if (IsNumberChar(next))
+			{
+				(@in, token) = SplitNumber(@in);
+				@out.Add(token);
+				continue;
+			}
+
+			// else
+			// (@in, token) = SplitOperator(ops, @in);
+			// var op = token.Operator;
+			// if (op is OpenBracket)
+			// {
+			// 	opStack.Push(token);
+			// 	continue;
+			// }
+			// if (op is ClosedBracket)
+			// {
+			// 	while (opStack.Peek().Operator is not OpenBracket)
+			// 	{
+			// 		@out.Add(opStack.Pop());
+			// 	}
+			// 	opStack.Pop();
+			// 	continue;
+			// }
+
+			// while (opStack.Peek().Operator.Precedence >= op.Precedence)
+			// {
+			// 	@out.Add(opStack.Pop());
+			// }
+			// opStack.Push(token);
 		}
-		tokens.Add(new Token{Key = TokenType.Eof});
-		return tokens.ToArray();
+
+		while (opStack.Count > 0)
+		{
+			@out.Add(opStack.Pop());
+		}
+		return @out;
 	}
 
-	private static (Token token, string leftover) NextToken(string @in)
+	private static void AddBrackets(Dictionary<string, IOperator> ops)
 	{
-		if (string.IsNullOrEmpty(@in))
-		{
-			return (new Token{Key = TokenType.Eof}, "");
-		}
-		if (char.IsAsciiDigit(@in[0]) || @in[0] == '.')
-		{
-			return NextNumber(@in);
-		}
-		if (char.IsAsciiLetterLower(@in[0]))
-		{
-			return NextFunc(@in);
-		}
-
-		var tokenT = @in[0] switch
-		{
-			'+' => TokenType.Add,
-			'-' => TokenType.Sub,
-			'*' => TokenType.Mul,
-			'/' => TokenType.Div,
-			'(' => TokenType.Open,
-			')' => TokenType.Close,
-			',' => TokenType.Comma,
-			_ => throw new CantTokenizeException(
-				$"symbol not supported: '{@in[0]}'"
-			),
-		};
-		
-		return (new Token{Key = tokenT}, @in[1..]);
+		var add = (IOperator op) => ops[op.RepresentedBy] = op;
+		add(new OpenBracket());
+		add(new ClosedBracket());
 	}
 
-	private static (Token token, string leftover) NextNumber(string @in)
+	private static (string, Token) SplitNumber(string @in)
 	{
-		var len = CountFirst(@in,
-			ch => char.IsAsciiDigit(ch) || ch == '.'
-		);
+		var len = CountFirst(@in, IsNumberChar);
 
-		var token = new Token
-		{
-			Key = TokenType.Number,
-			Value = @in[..len],
-		};
-		return (token, @in[len..]);
+		var token = new Token(float.Parse(@in[..len]));
+		return (@in[len..], token);
 	}
 
-	private static (Token token, string leftover) NextFunc(string @in)
+	// private static (string, Token) SplitOperator(Dictionary<string, IOperator> ops, string @in)
+	// {
+	// 	// Did not use `.Single(predicate)`
+	// 	// so that I can throw a custom exception 
+	// 	var keys = ops.Keys.Where(@in.StartsWith);
+	// 	if (keys.Count() != 1)
+	// 	{
+	// 		throw new NotImplementedException();
+	// 	}
+	// 	var key = keys.Single();
+
+	// 	var token = new Token(ops[key]);
+	// 	return (@in[key.Length..], token);
+	// }
+
+	private static bool IsNumberChar(char ch)
 	{
-		var len = CountFirst(@in, char.IsAsciiLetterLower);
-		var value = @in[..len];
-		if (!SupportedFunc.Contains(value))
-		{
-			throw new CantTokenizeException(
-				$"function not supported: '{value}'"
-			);
-		}
-		var token = new Token
-		{
-			Key = TokenType.Func,
-			Value = value,
-		};
-		return (token, @in[len..]);
+		return char.IsAsciiDigit(ch) || ch == '.';
 	}
 
 	private static int CountFirst(string @in, Func<char, bool> predicate)

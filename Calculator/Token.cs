@@ -1,25 +1,44 @@
 namespace Calculator;
 
-public enum TokenType
+public readonly struct Token
 {
-	Number,
+	private readonly float? number;
+	private readonly IOperator? op;
+
+	public readonly bool IsNumber => number.HasValue;
+	public readonly bool IsOperator => op != null;
 	
-	Add,
-	Sub,
-	Mul,
-	Div,
+	public Token(float value)
+	{
+		number = value;
+	}
 
-	Open,
-	Close,
-	Comma,
+	public Token(IOperator @operator)
+	{
+		op = @operator;
+	}
 
-	Func,
+	public float Number
+	{
+		get
+		{
+			if (!IsNumber)
+			{
+				throw new NotImplementedException();
+			}
+			return number.Value;
+		}
+	}
 
-	Eof,
-}
-
-public struct Token
-{
-	public TokenType Key;
-	public string Value;
+	public IOperator Operator
+	{
+		get
+		{
+			if (!IsOperator)
+			{
+				throw new NotImplementedException();
+			}
+			return op;
+		}
+	}
 }
