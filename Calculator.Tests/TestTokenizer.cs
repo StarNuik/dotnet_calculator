@@ -31,11 +31,14 @@ public class TestTokenizer
 	[InlineData("1 * 2 * 3", "1 2 * 3 *")]
 	[InlineData("1 / 2 / 3", "1 2 / 3 /")]
 	public void SingleOperator(string expr, string want)
-	{
-		var tokens = Tokenizer.ToRpn(operators, expr);
-		var rpn = ToString(tokens);
-		Assert.Equal(want, rpn);
-	}
+		=> AssertRpn(expr, want);
+
+	[Theory]
+	[InlineData("1 + 2 * 3", "1 2 3 * +")]
+	[InlineData("1 * 2 + 3", "1 2 * 3 +")]
+	[InlineData("1 * 2 - 3 * 4 / 5 + 6 - 7 * 8 * 9", "1 2 * 3 4 * 5 / - 6 + 7 8 * 9 * -")]
+	public void Precedence(string expr, string want)
+		=> AssertRpn(expr, want);
 
 	[Theory]
 	// [InlineData("1 ** 1")]
@@ -53,6 +56,13 @@ public class TestTokenizer
 		Assert.Throws<TokenizerException>(
 			() => Tokenizer.ToRpn(operators, expr)
 		);
+	}
+
+	private void AssertRpn(string expr, string want)
+	{
+		var tokens = Tokenizer.ToRpn(operators, expr);
+		var rpn = ToString(tokens);
+		Assert.Equal(want, rpn);
 	}
 
 	private string ToString(Token[] tokens)
