@@ -15,7 +15,7 @@ public static class Tokenizer
     }
 
 	// TODO: clean up this majestic blanket of code
-    public static List<Token> ToRpn(IOperator[] operators, string @in)
+    public static Token[] ToRpn(IOperator[] operators, string @in)
 	{
 		// var ops = operators.ToDictionary(
 		// 	op => op.RepresentedBy,
@@ -64,11 +64,11 @@ public static class Tokenizer
 			// opStack.Push(token);
 		}
 
-		while (opStack.Count > 0)
-		{
-			@out.Add(opStack.Pop());
-		}
-		return @out;
+		// while (opStack.Count > 0)
+		// {
+		// 	@out.Add(opStack.Pop());
+		// }
+		return @out.ToArray();
 	}
 
 	private static void AddBrackets(Dictionary<string, IOperator> ops)
