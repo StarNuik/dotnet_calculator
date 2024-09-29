@@ -11,15 +11,19 @@ public static class Tokenizer
 	private class Open : IOperator
 	{
 		public string RepresentedBy => "(";
+
 		public int Precedence => throw new NotImplementedException();
 		public Associativity Associativity => throw new NotImplementedException();
+		public float Execute(float lhs, float rhs) => throw new NotImplementedException();
 	}
 
 	private class Close : IOperator
 	{
 		public string RepresentedBy => ")";
+		
 		public int Precedence => throw new NotImplementedException();
 		public Associativity Associativity => throw new NotImplementedException();
+		public float Execute(float lhs, float rhs) => throw new NotImplementedException();
 	}
 
 	// TODO: clean up this majestic blanket of code

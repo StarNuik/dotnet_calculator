@@ -12,6 +12,8 @@ public interface IOperator
 	public int Precedence { get; }
 	public Associativity Associativity { get; }
 
+	public float Execute(float lhs, float rhs);
+
 	public bool GreaterThan(IOperator other)
 	{
 		return this.Precedence > other.Precedence
