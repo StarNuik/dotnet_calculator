@@ -24,7 +24,7 @@ public readonly struct Token
 		{
 			if (!IsNumber)
 			{
-				throw new NotImplementedException();
+				throw new CalculatorException("taking this value is not allowed");
 			}
 			return number.Value;
 		}
@@ -36,7 +36,7 @@ public readonly struct Token
 		{
 			if (!IsOperator)
 			{
-				throw new NotImplementedException();
+				throw new CalculatorException("taking this value is not allowed");
 			}
 			return op;
 		}
