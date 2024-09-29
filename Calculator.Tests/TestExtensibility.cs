@@ -4,39 +4,31 @@ namespace Calculator.Tests;
 
 public class TestExtensibility
 {
-    private class MockOperator : IOperator
-    {
-        public string RepresentedBy { get; set; } = "";
-        public int Precedence { get; set; }
-        public Associativity Associativity { get; set; }
-		public Func<float, float, float>? ExecuteFunc { get; set; }
+	private class Exp : IOperator
+	{
+		public string RepresentedBy => "^";
+		public int Precedence => 4;
+		public Associativity Associativity => Associativity.Right;
 
-        public float Execute(float lhs, float rhs)
-			=> ExecuteFunc(lhs, rhs);
-    }
+		public float Execute(float lhs, float rhs)
+			=> MathF.Pow(lhs, rhs);
+	}
 
-    [Theory]
-	[InlineData("2 ^ 4", 16f)]
-	[InlineData("2 ^ (3 + 1)", 16f)]
-	[InlineData("(1 + 1) ^ 4", 16f)]
-	[InlineData("2 ^ 4 ^ 2", 65536f)]
-	[InlineData("(0.5 * 4) ^ (2 * 2) ^ (3 - 1)", 65536f)]
-	public void IsExtensible(string expr, float want)
+	[Theory]
+	[InlineData("2 ^ 4", "16")]
+	[InlineData("2 ^ (3 + 1)", "16")]
+	[InlineData("(1 + 1) ^ 4", "16")]
+	[InlineData("2 ^ 4 ^ 2", "65536")]
+	[InlineData("(0.5 * 4) ^ (2 * 2) ^ (3 - 1)", "65536")]
+	public void IsExtensible(string expr, string want)
 	{
 		var before = Operators.Default.Array;
-		Assert.Throws<CalculatorException>(
-			() => Program.Do(before, expr)
-		);
+		var err = Program.DoString(before, expr);
+		Assert.StartsWith("Error:", err);
 
-		var op = new MockOperator()
-		{
-			RepresentedBy = "^",
-			Precedence = 4,
-			Associativity = Associativity.Right,
-			ExecuteFunc = (lhs, rhs) => MathF.Pow(lhs, rhs),
-		};
-		var after = before.Append(op).ToArray();
-		var res = Program.Do(after, expr);
+		var op = new Exp();
+		var extended = Operators.Default.Array.Append(op);
+		var res = Program.DoString(extended.ToArray(), expr);
 		Assert.Equal(want, res);
 	}
 }
