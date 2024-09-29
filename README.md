@@ -1,5 +1,5 @@
 # dotnet_calculator
-Basic Cli calculator
+Simple C# calculator. Can be used both as a Cli binary and a library. Can be extended by adding new operators. Built using Djikstra's Shunting Yard algorithm to produce Rpn-like tokens which are passed into a simple Rpn machine.
 
 ## Installation
 ```bash
