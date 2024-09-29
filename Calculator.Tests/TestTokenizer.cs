@@ -58,7 +58,7 @@ public class TestTokenizer
 	// [InlineData("1 * (2 (+ 3))")]
 	public void Exceptions(string expr)
 	{
-		Assert.Throws<TokenizerException>(
+		Assert.Throws<CalculatorException>(
 			() => Tokenizer.ToRpn(Operators.Default.Array, expr)
 		);
 	}

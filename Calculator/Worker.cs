@@ -19,10 +19,16 @@ public static class Worker
 			var res = op.Execute(lhs, rhs);
 			stack.Push(res);
 		}
-		if (stack.Count != 1)
+
+		if (stack.Count > 1)
 		{
-			throw new NotImplementedException();
+			throw new CalculatorException("not enough operators");
 		}
+		if (stack.Count == 0)
+		{
+			throw new CalculatorException("unknown error");
+		}
+		
 		return stack.Single();
 	}
 
@@ -34,7 +40,7 @@ public static class Worker
 
 		if (!ok)
 		{
-			throw new NotImplementedException();
+			throw new CalculatorException("too many operators");
 		}
 		return (lhs, rhs);
 	}

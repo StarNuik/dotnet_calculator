@@ -1,30 +1,10 @@
 namespace Calculator;
 
-public class TokenizerException : Exception
-{
-	public TokenizerException(string message) : base(message)
-	{}
-}
+using Parentheses = Calculator.Operators.Parentheses;
 
 public static class Tokenizer
 {
-	private class Open : IOperator
-	{
-		public string RepresentedBy => "(";
-
-		public int Precedence => throw new NotImplementedException();
-		public Associativity Associativity => throw new NotImplementedException();
-		public float Execute(float lhs, float rhs) => throw new NotImplementedException();
-	}
-
-	private class Close : IOperator
-	{
-		public string RepresentedBy => ")";
-		
-		public int Precedence => throw new NotImplementedException();
-		public Associativity Associativity => throw new NotImplementedException();
-		public float Execute(float lhs, float rhs) => throw new NotImplementedException();
-	}
+	
 
 	// TODO: clean up this majestic blanket of code
 	public static Token[] ToRpn(IOperator[] operators, string @in)
@@ -33,7 +13,7 @@ public static class Tokenizer
 			op => op.RepresentedBy,
 			op => op
 		);
-		AddParentheses(ops);
+		Parentheses.AddTo(ops);
 
 		var @out = new List<Token>();
 		var opStack = new Stack<Token>();
@@ -53,12 +33,12 @@ public static class Tokenizer
 
 			// else
 			(@in, token, var op) = SplitOperator(ops, @in);
-			if (op is Open)
+			if (op is Parentheses.Open)
 			{
 				opStack.Push(token);
 				continue;
 			}
-			if (op is Close)
+			if (op is Parentheses.Close)
 			{
 				MoveUntilOpen(opStack, @out);
 				opStack.Pop();
@@ -79,7 +59,7 @@ public static class Tokenizer
 	{
 		var @out = new List<Token>();
 		while (from.Count > 0
-			&& from.Peek().Operator is not Open
+			&& from.Peek().Operator is not Parentheses.Open
 			&& from.Peek().Operator.GreaterThan(op))
 		{
 			to.Add(from.Pop());
@@ -89,31 +69,24 @@ public static class Tokenizer
 	private static void MoveUntilOpen(Stack<Token> from, List<Token> to)
 	{
 		while (from.Count > 0
-			&& from.Peek().Operator is not Open)
+			&& from.Peek().Operator is not Parentheses.Open)
 		{
 			to.Add(from.Pop());
 		}
 		if (from.Count == 0)
 		{
-			throw new TokenizerException("invalid parentheses");
+			throw new CalculatorException("invalid parentheses");
 		}
 	}
 
 	private static void MoveFinal(Stack<Token> opStack, List<Token> @out)
 	{
-		if (opStack.Any(tok => tok.Operator is Open))
+		if (opStack.Any(tok => tok.Operator is Parentheses.Open))
 		{
-			throw new TokenizerException("invalid parentheses");
+			throw new CalculatorException("invalid parentheses");
 		}
 		@out.AddRange(opStack);
 		opStack.Clear();
-	}
-
-	private static void AddParentheses(Dictionary<string, IOperator> ops)
-	{
-		var add = (IOperator op) => ops[op.RepresentedBy] = op;
-		add(new Open());
-		add(new Close());
 	}
 
 	private static (string, Token) SplitNumber(string @in)
@@ -127,7 +100,7 @@ public static class Tokenizer
 		}
 		catch (Exception e)
 		{
-			throw new TokenizerException($"couldn't parse number: {e.Message}");
+			throw new CalculatorException($"couldn't parse number: {e.Message}");
 		}
 
 		var token = new Token(val);
@@ -141,7 +114,7 @@ public static class Tokenizer
 		var keys = ops.Keys.Where(@in.StartsWith);
 		if (keys.Count() != 1)
 		{
-			throw new TokenizerException("unknown operator");
+			throw new CalculatorException("unknown operator");
 		}
 		var key = keys.Single();
 
