@@ -2,20 +2,13 @@ namespace Calculator.Tests;
 
 public class TestTokenizer
 {
-	private IOperator[] operators = [
-		new Operators.Add(),
-		new Operators.Sub(),
-		new Operators.Mul(),
-		new Operators.Div(),
-	];
-
 	[Theory]
 	[InlineData("1", 1f)]
 	[InlineData("5.3", 5.3f)]
 	[InlineData(".1", 0.1f)]
 	public void Numbers(string expr, float want)
 	{
-		var tokens = Tokenizer.ToRpn(null, expr);
+		var tokens = Tokenizer.ToRpn([], expr);
 		Assert.Single(tokens);
 		Assert.True(tokens[0].IsNumber);
 		Assert.Equal(want, tokens[0].Number);
@@ -66,13 +59,13 @@ public class TestTokenizer
 	public void Exceptions(string expr)
 	{
 		Assert.Throws<TokenizerException>(
-			() => Tokenizer.ToRpn(operators, expr)
+			() => Tokenizer.ToRpn(Operators.Default.Array, expr)
 		);
 	}
 
 	private void AssertRpn(string expr, string want)
 	{
-		var tokens = Tokenizer.ToRpn(operators, expr);
+		var tokens = Tokenizer.ToRpn(Operators.Default.Array, expr);
 		var rpn = ToString(tokens);
 		Assert.Equal(want, rpn);
 	}
