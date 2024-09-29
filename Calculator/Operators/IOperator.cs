@@ -8,20 +8,28 @@ public enum Associativity
 
 public interface IOperator
 {
-	// This full sequence of characters is required to appear in the input string to invoke the operator.
+	/// <summary>
+	/// This full sequence of characters will be parsed into the operator.
+	/// </summary>
 	public string RepresentedBy { get; }
 
-	// Priority of operator execution. Higher precedence will result in earlier execution.
-	// Add / Sub haev a precedence of 1
-	// Mul / Div have a precedence of 2
+	/// <summary>
+	/// Priority of operator execution. Higher precedence will result in earlier execution.
+	/// Add / Sub haev a precedence of 1
+	/// Mul / Div have a precedence of 2
+	/// </summary>
 	public int Precedence { get; }
 	
-	// In what direction should multi-operator expressions be executed.
-	// Left Example: "1 - 2 - 3" == "(1 - 2) - 3"
-	// Right Example: "1 ^ 2 ^ 3" == "1 ^ (2 ^ 3)
+	/// <summary>
+	/// In what direction should multi-operator expressions be executed.
+	/// Left Example: "1 - 2 - 3" == "(1 - 2) - 3"
+	/// Right Example: "1 ^ 2 ^ 3" == "1 ^ (2 ^ 3)
+	/// </summary>
 	public Associativity Associativity { get; }
 
-	// Calculates the result of the operator.
+	/// <summary>
+	/// Calculates the result of the operator.
+	/// </summary>
 	public float Execute(float lhs, float rhs);
 
 	public bool GreaterThan(IOperator other)
