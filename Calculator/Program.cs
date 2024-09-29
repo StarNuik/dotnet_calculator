@@ -6,24 +6,27 @@ public class Program
 	{
 		var together = string.Join(" ", args);
 		
-		float res;
+		var res = DoString(Operators.Default.Array, together);
+		
+		Console.WriteLine(res);
+	}
+
+	public static string DoString(IOperator[] operators, string @in)
+	{
 		try
 		{
-			res = Do(together);
+			var @out = Do(operators, @in);
+			return @out.ToString();
 		}
 		catch (CalculatorException e)
 		{
-			Console.WriteLine($"Error: {e.Message}");
-			return;
+			return $"Error: {e.Message}";
 		}
-		
-		Console.WriteLine(res.ToString());
 	}
 
-	public static float Do(string @in)
+	public static float Do(IOperator[] operators, string @in)
 	{
-		var ops = Operators.Default.Array;
-		var tokens = Tokenizer.ToRpn(ops, @in);
+		var tokens = Tokenizer.ToRpn(operators, @in);
 		var @out = Worker.Calculate(tokens);
 		return @out;
 	}
