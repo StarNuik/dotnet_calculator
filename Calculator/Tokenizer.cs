@@ -4,9 +4,6 @@ using Parentheses = Calculator.Operators.Parentheses;
 
 public static class Tokenizer
 {
-	
-
-	// TODO: clean up this majestic blanket of code
 	public static Token[] ToRpn(IOperator[] operators, string @in)
 	{
 		var ops = operators.ToDictionary(
